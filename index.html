@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi Leaf Health and Motor Control</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            color: #555;
+        }
+
+        #stream-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        img {
+            max-width: 480px;
+            width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .control-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .side-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-button {
+            font-size: 18px;
+            padding: 15px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .control-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Raspberry Pi Leaf Health and Motor Control</h1>
+
+    <div id="stream-container">
+        <img id="leafImage">
+    </div>
+
+    <div class="control-container">
+        <div class="side-buttons">
+            <button class="control-button" onclick="sendCommand('forward')">↑ Front</button>
+            <button class="control-button" onclick="sendCommand('reverse')">↓ Back</button>
+        </div>
+
+        <div class="side-buttons">
+            <button class="control-button" onclick="sendCommand('left')">← Left</button>
+            <button class="control-button" onclick="sendCommand('right')">Right →</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('frame', function(data) {
+            var img = document.getElementById('leafImage');
+            img.src = 'data:image/jpeg;base64,' + data.image;
+        });
+
+        function sendCommand(command) {
+            socket.emit('motor_command', { 'command': command });
+        }
+    </script>
+</body>
+</html>
